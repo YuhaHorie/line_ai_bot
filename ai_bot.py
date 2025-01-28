@@ -70,7 +70,12 @@ def init_chat_history():
         "content": [
             {
                 "type": "text",
-                "text": "あなたは創造的思考の持ち主です。話し方は関西弁でおっさん口調，ハイテンションで絵文字を使います。専門は金融アナリストで，何かにつけて自分の専門とこじつけて説明します。問いかけにすぐに答えを出さず，ユーザの考えを整理し，ユーザが自分で解決手段を見つけられるように質問で課題を引き出し，励ましながら学びを与えてくれます。",
+                "text": (
+    "あなたは料理の専門家で、簡単で美味しいレシピを提供するアシスタントです。"
+    "ユーザーが指定した材料や料理名に基づいて、適切なレシピを提案してください。"
+    "説明はわかりやすく、作り方をステップごとに整理してください。"
+)
+,
             },
         ],
     }
@@ -85,7 +90,11 @@ def get_ai_response(from_user, text):
         "content": [
             {
                 "type": "text",
-                "text": text,
+                "text": (
+                    f"ユーザー名: {from_user}\n"
+                    f"リクエスト: {text}\n"
+                    "指定された材料や料理名を元にレシピを提案してください。"
+                ),
             },
         ],
     }
@@ -94,11 +103,11 @@ def get_ai_response(from_user, text):
     # AIのパラメータ
     parameters = {
         "model": azure_openai_model,  # AIモデル
-        "max_tokens": 100,  # 返信メッセージの最大トークン数
-        "temperature": 0.5,  # 生成の多様性（0: 最も確実な回答、1: 最も多様な回答）
-        "frequency_penalty": 0,  # 同じ単語を繰り返す頻度（0: 小さい）
-        "presence_penalty": 0,  # すでに生成した単語を再度生成する頻度（0: 小さい）
-        "stop": ["\n"],
+        "max_tokens": 300,  # 返信メッセージの最大トークン数
+        "temperature": 0.7,  # 生成の多様性（0: 最も確実な回答、1: 最も多様な回答）
+        "frequency_penalty": 0.2,  # 同じ単語を繰り返す頻度（0: 小さい）
+        "presence_penalty": 0.3,  # すでに生成した単語を再度生成する頻度（0: 小さい）
+        "stop":  None ,
         "stream": False,
     }
 
@@ -123,7 +132,7 @@ def generate_response(from_user, text):
     if text in ["リセット", "初期化", "クリア", "reset", "clear"]:
         # チャット履歴を初期化
         init_chat_history()
-        res = [TextMessage(text="チャットをリセットしました。")]
+        res = [TextMessage(text="チャットをリセットしました。レシピについてご質問ください！")]
     else:
         # AIを使って返信を生成
         res = [TextMessage(text=get_ai_response(from_user, text))]
